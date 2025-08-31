@@ -1,56 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Stack Game</title>
-  <style>
-    body { margin: 0; overflow: hidden; background: #222; }
-    canvas { display: block; margin: auto; background: #333; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="gameCanvas" width="400" height="600"></canvas>
-  <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+  <div class="game-container">
+    <div class="score-bar">
+      <div class="score">Score: <span id="score">47</span></div>
+      <div class="icons">
+        <div class="icon crown">👑 <span>43</span></div>
+        <div class="icon diamond">💎 <span>25</span> <span class="plus">+3</span></div>
+      </div>
+    </div>
 
-    let stack = [{ x: 150, y: 550, width: 100 }];
-    let current = { x: 0, y: 500, width: 100, speed: 2 };
-    let direction = 1;
-    let score = 0;
+    <div class="stack-area" id="stackArea">
+      <!-- Blocks will be added here -->
+    </div>
 
-    function drawBlock(block, color = "#4CC3D9") {
-      ctx.fillStyle = color;
-      ctx.fillRect(block.x, block.y, block.width, 20);
-    }
+    <div class="restart-overlay" onclick="restartGame()">TAP TO RESTART</div>
 
-    function update() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      stack.forEach(b => drawBlock(b));
-      drawBlock(current, "#F16745");
+    <div class="bottom-bar">
+      <button>⚙️</button>
+      <button>🏠</button>
+      <button>🔄</button>
+      <button>📺 AD</button>
+    </div>
+  </div>
 
-      current.x += current.speed * direction;
-      if (current.x <= 0 || current.x + current.width >= canvas.width) direction *= -1;
-
-      requestAnimationFrame(update);
-    }
-
-    canvas.addEventListener('click', () => {
-      const last = stack[stack.length - 1];
-      const overlap = Math.min(current.x + current.width, last.x + last.width) - Math.max(current.x, last.x);
-      if (overlap > 0) {
-        current.width = overlap;
-        current.x = Math.max(current.x, last.x);
-        current.y = last.y - 20;
-        stack.push({ ...current });
-        current = { x: 0, y: current.y - 20, width: current.width, speed: 2 };
-        score++;
-      } else {
-        alert("Game Over! Score: " + score);
-        location.reload();
-      }
-    });
-
-    update();
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
