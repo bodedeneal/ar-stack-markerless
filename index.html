@@ -1,19 +1,56 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Simple Markerless AR</title>
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  </head>
-  <body>
-    <a-scene
-      vr-mode-ui="enabled: false"
-      embedded
-      arjs="sourceType: webcam; trackingMethod: best;"
-    >
-      <a-entity camera></a-entity>
+<head>
+  <title>Stack Game</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #222; }
+    canvas { display: block; margin: auto; background: #333; }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
 
-      <!-- Simple block -->
-      <a-box position="0 0.5 -2" color="#4CC3D9" depth="0.5" height="1" width="0.5"></a-box>
-    </a-scene>
-  </body>
+    let stack = [{ x: 150, y: 550, width: 100 }];
+    let current = { x: 0, y: 500, width: 100, speed: 2 };
+    let direction = 1;
+    let score = 0;
+
+    function drawBlock(block, color = "#4CC3D9") {
+      ctx.fillStyle = color;
+      ctx.fillRect(block.x, block.y, block.width, 20);
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stack.forEach(b => drawBlock(b));
+      drawBlock(current, "#F16745");
+
+      current.x += current.speed * direction;
+      if (current.x <= 0 || current.x + current.width >= canvas.width) direction *= -1;
+
+      requestAnimationFrame(update);
+    }
+
+    canvas.addEventListener('click', () => {
+      const last = stack[stack.length - 1];
+      const overlap = Math.min(current.x + current.width, last.x + last.width) - Math.max(current.x, last.x);
+      if (overlap > 0) {
+        current.width = overlap;
+        current.x = Math.max(current.x, last.x);
+        current.y = last.y - 20;
+        stack.push({ ...current });
+        current = { x: 0, y: current.y - 20, width: current.width, speed: 2 };
+        score++;
+      } else {
+        alert("Game Over! Score: " + score);
+        location.reload();
+      }
+    });
+
+    update();
+  </script>
+</body>
 </html>
